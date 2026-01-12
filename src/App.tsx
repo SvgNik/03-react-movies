@@ -33,7 +33,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  };g
+  };
 
   const openModal = (movie: Movie) => {
     setSelectedMovie(movie);
