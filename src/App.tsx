@@ -1,4 +1,5 @@
 import { useState } from "react";
+import css from "./App.module.css";
 import { fetchMovies } from "./services/movieService";
 import type { Movie } from "./types/movie";
 import SearchBar from "./components/SearchBar/SearchBar";
@@ -44,8 +45,9 @@ function App() {
   };
 
   return (
-    <div>
+    <div className={css.app}>
       <Toaster position="top-right" />
+
       <SearchBar onSubmit={handleSearch} />
 
       {isLoading && <Loader />}
