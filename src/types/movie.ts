@@ -1,16 +1,16 @@
 export interface Movie {
   id: number;
-  poster_path: string;
-  backdrop_path: string;
   title: string;
-  overview: string;
-  release_date: string;
+  poster_path: string;
   vote_average: number;
+  release_date: string;
+  overview: string;
+  backdrop_path?: string; 
 }
 
-export interface FetchMoviesResponse {
+export interface MovieResponse {
   page: number;
-  results: Movie[];
+  results: Movie[]; 
   total_pages: number;
   total_results: number;
 }
