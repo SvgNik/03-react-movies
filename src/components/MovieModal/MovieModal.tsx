@@ -1,4 +1,4 @@
-import { useEffect, type MouseEvent } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import type { Movie } from "../../types/movie";
 import css from "./MovieModal.module.css";
@@ -10,69 +10,52 @@ interface MovieModalProps {
 
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Escape") {
-        onClose();
-      }
+      if (e.code === "Escape") onClose();
     };
 
     window.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
     };
   }, [onClose]);
 
-  const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose();
   };
 
   return createPortal(
-    <div className={css.overlay} onClick={handleBackdropClick}>
+    <div
+      className={css.backdrop}
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className={css.modal}>
         <button
-          className={css.closeBtn}
+          className={css.closeButton}
           onClick={onClose}
           aria-label="Close modal"
         >
-          ×
+          &times;
         </button>
-
+        <img
+          src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+          alt={movie.title}
+          className={css.image}
+        />
         <div className={css.content}>
-          <img
-            src={
-              movie.poster_path
-                ? `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
-                : "https://via.placeholder.com/500x750?text=No+Image"
-            }
-            alt={movie.title}
-            className={css.poster}
-          />
-
-          <div className={css.info}>
-            <h2 className={css.title}>{movie.title}</h2>
-            <p className={css.text}>
-              <strong>Rating:</strong> {movie.vote_average}
-            </p>
-            <p className={css.text}>
-              <strong>Release Date:</strong> {movie.release_date}
-            </p>
-            <div className={css.overview}>
-              <strong>Overview:</strong>
-              <p>{movie.overview}</p>
-            </div>
-          </div>
+          <h2>{movie.title}</h2>
+          <p>{movie.overview}</p>
+          <p>
+            <strong>Release Date:</strong> {movie.release_date}
+          </p>
+          <p>
+            <strong>Rating:</strong> {movie.vote_average}/10
+          </p>
         </div>
       </div>
     </div>,
