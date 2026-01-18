@@ -1,7 +1,7 @@
 import { useEffect, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import type { Movie } from "../../types/movie";
-import styles from "./MovieModal.module.css";
+import css from "./MovieModal.module.css";
 
 interface MovieModalProps {
   movie: Movie;
@@ -10,6 +10,16 @@ interface MovieModalProps {
 
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Escape") {
         onClose();
@@ -17,7 +27,6 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -30,30 +39,44 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   };
 
   return createPortal(
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
-      <div className={styles.modal}>
-        <button className={styles.closeButton} onClick={onClose}>
-          &times;
+    <div className={css.overlay} onClick={handleBackdropClick}>
+      <div className={css.modal}>
+        <button
+          className={css.closeBtn}
+          onClick={onClose}
+          aria-label="Close modal"
+        >
+          ×
         </button>
 
-        <img
-          src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
-          alt={movie.title}
-          className={styles.image}
-        />
-        <div className={styles.content}>
-          <h2>{movie.title}</h2>
-          <p>{movie.overview}</p>
-          <p>
-            <strong>Release Date:</strong> {movie.release_date}
-          </p>
-          <p>
-            <strong>Rating:</strong> {movie.vote_average}
-          </p>
+        <div className={css.content}>
+          <img
+            src={
+              movie.poster_path
+                ? `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
+                : "https://via.placeholder.com/500x750?text=No+Image"
+            }
+            alt={movie.title}
+            className={css.poster}
+          />
+
+          <div className={css.info}>
+            <h2 className={css.title}>{movie.title}</h2>
+            <p className={css.text}>
+              <strong>Rating:</strong> {movie.vote_average}
+            </p>
+            <p className={css.text}>
+              <strong>Release Date:</strong> {movie.release_date}
+            </p>
+            <div className={css.overview}>
+              <strong>Overview:</strong>
+              <p>{movie.overview}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
